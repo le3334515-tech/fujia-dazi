@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4eee2">
+  <meta name="description" content="副驾搭子陪你听段子、故事和脑洞谜题，听到疑似鸣笛时也会轻轻接一句。">
+  <link rel="canonical" href="https://le3334515-tech.github.io/fujia-dazi/">
+  <title>副驾搭子</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./horn-detector.js"></script>
+  <script defer src="./radio-player.js"></script>
+  <script defer src="./app.js"></script>
+  <script defer src="./pit-stop.js"></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 11v2m4-5v8m5-12v16m5-12v8m4-5v2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s7-3.4 7-9V5l-7-3-7 3v8c0 5.6 7 9 7 9Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11v1a7 7 0 0 0 14 0v-1m-7 8v3m-3 0h6"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="m6 6 9 6-9 6Zm12 0v12"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v13"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6m2.8-8.8a8 8 0 0 1 0 11.6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.5 8.5c0 4.6-8.5 9.8-8.5 9.8s-8.5-5.2-8.5-9.8A4.5 4.5 0 0 1 12 6.4a4.5 4.5 0 0 1 8.5 2.1Z"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01m6 0h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m6 12 4 4 8-8"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h7m4 0h5M4 12h2m4 0h10M4 18h11m4 0h1"/><circle cx="13" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c4 0 6-10 10-10h3m-3-3 3 3-3 3"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 14 4-4m-6.5 1.5L5 14a3.5 3.5 0 0 0 5 5l2.5-2.5m-1-9L14 5a3.5 3.5 0 0 1 5 5l-2.5 2.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5Zm13 1h2a2.5 2.5 0 0 1 0 5h-2M3 22h17M9 2v3m4-3v3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  </svg>
+
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="副驾搭子首页"><span class="brand-mark"><svg class="icon"><use href="#i-wave"/></svg></span><span>副驾搭子</span></a>
+      <nav class="topnav" aria-label="页面导航">
+        <a href="#radio">解闷电台</a><a href="#detector-panel">鸣笛感应</a><a href="#pit-stop">停车补给</a>
+      </nav>
+      <div class="share">
+        <button class="share-button" id="share-button" type="button"><svg class="icon"><use href="#i-link"/></svg><span id="share-label">复制链接</span></button>
+        <span id="share-status" class="visually-hidden" role="status"></span>
+        <div class="share-fallback" id="share-fallback" hidden>
+          <label for="share-url">长按或选中复制公开链接</label>
+          <input id="share-url" type="url" readonly>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-content">
+          <h1 id="hero-title">路上无聊？<br><span>听点开心的。</span></h1>
+          <p>路上段子、轻松故事、脑洞谜题，点一下就开播。</p>
+          <div class="hero-actions">
+            <button class="hero-play" id="radio-quick-start" type="button"><svg class="icon"><use href="#i-play"/></svg>听个段子</button>
+            <a class="hero-link" href="#pit-stop">停车补给 <svg class="icon"><use href="#i-arrow"/></svg></a>
+          </div>
+        </div>
+      </section>
+
+      <div class="dashboard">
+        <div class="main-column">
+          <section class="panel radio" id="radio" aria-labelledby="radio-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="radio-title">解闷电台</h2>
+                <p>选好一组，节目就会接着播。</p>
+              </div>
+              <button type="button" class="favorite-library" data-radio-category="favorites" aria-pressed="false"><svg class="icon"><use href="#i-heart"/></svg>我的收藏</button>
+            </div>
+            <div class="radio-categories" role="group" aria-label="节目分类">
+              <button type="button" class="radio-category category-jokes" data-radio-category="jokes" aria-pressed="false">
+                <svg class="icon"><use href="#i-smile"/></svg><span>路上段子</span>
+              </button>
+              <button type="button" class="radio-category category-stories" data-radio-category="stories" aria-pressed="false">
+                <svg class="icon"><use href="#i-book"/></svg><span>轻松故事</span>
+              </button>
+              <button type="button" class="radio-category category-riddles" data-radio-category="riddles" aria-pressed="false">
+                <svg class="icon"><use href="#i-spark"/></svg><span>脑洞谜题</span>
+              </button>
+            </div>
+            <div class="radio-player">
+              <div class="radio-art" aria-hidden="true"><svg class="icon"><use href="#i-wave"/></svg></div>
+              <div class="radio-info">
+                <div class="radio-current" role="status">
+                  <strong id="radio-track">想听点什么？</strong><span id="radio-counter"></span>
+                </div>
+                <p id="radio-meta">听电台无需开启麦克风。</p>
+                <progress id="radio-progress" max="1" value="0" aria-label="播放进度"></progress>
+              </div>
+              <div class="radio-controls">
+                <button class="radio-control radio-control-main" id="radio-play" type="button"><svg class="icon"><use id="radio-play-icon" href="#i-play"/></svg><span id="radio-play-label">播放</span></button>
+                <button class="radio-control" id="radio-next" type="button" disabled><svg class="icon"><use href="#i-next"/></svg>下一段</button>
+              </div>
+            </div>
+            <div class="radio-actions">
+              <button class="tool-button" id="radio-shuffle" type="button" aria-pressed="false"><svg class="icon"><use href="#i-shuffle"/></svg><span id="radio-shuffle-label">随机播放</span></button>
+              <button class="tool-button" id="radio-favorite" type="button" aria-pressed="false" disabled><svg class="icon"><use href="#i-heart"/></svg><span id="radio-favorite-label">收藏这段</span></button>
+            </div>
+          </section>
+
+          <section class="panel pit" id="pit-stop" aria-labelledby="pit-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="pit-title">停车补给</h2>
+                <p>停稳了，给刚才那一路一个收尾。</p>
+              </div>
+              <span class="pit-mark" aria-hidden="true"><svg class="icon"><use href="#i-coffee"/></svg></span>
+            </div>
+            <form id="pit-form">
+              <div class="pit-modes" role="group" aria-label="选择回应方式">
+                <button type="button" data-pit-mode="comfort" aria-pressed="true"><svg class="icon"><use href="#i-heart"/></svg>想被安慰</button>
+                <button type="button" data-pit-mode="humor" aria-pressed="false"><svg class="icon"><use href="#i-smile"/></svg>想笑一下</button>
+              </div>
+              <div class="pit-topics" role="group" aria-label="刚才遇到什么">
+                <button type="button" data-pit-topic="traffic" aria-pressed="false">堵了好久</button>
+                <button type="button" data-pit-topic="honk" aria-pressed="false">被喇叭催</button>
+                <button type="button" data-pit-topic="cutin" aria-pressed="false">被加塞</button>
+                <button type="button" data-pit-topic="longday" aria-pressed="false">今天有点累</button>
+              </div>
+              <label class="visually-hidden" for="pit-input">说说刚才发生了什么，可选</label>
+              <textarea id="pit-input" rows="2" maxlength="160" placeholder="也可以留一句吐槽……" aria-describedby="pit-privacy"></textarea>
+              <div class="pit-submit-row">
+                <p id="pit-privacy">文字仅在本机匹配预设短句。</p>
+                <button class="pit-submit" id="pit-submit" type="submit">给我一句 <svg class="icon"><use href="#i-arrow"/></svg></button>
+              </div>
+            </form>
+            <div class="pit-result" id="pit-result" hidden>
+              <div class="pit-result-body" role="status">
+                <h3 id="pit-result-title"></h3>
+                <p id="pit-result-text"></p>
+              </div>
+              <div class="pit-result-actions">
+                <button class="tool-button" id="pit-copy" type="button"><svg class="icon"><use href="#i-copy"/></svg>复制这句</button>
+                <span id="pit-copy-status" role="status"></span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="side-column">
+          <section class="panel detector" id="detector-panel" data-state="idle" aria-labelledby="detector-title">
+            <div class="section-heading">
+              <h2 id="detector-title">鸣笛感应</h2>
+              <span id="status-pill" class="status-pill" role="status"><i></i><span id="status-label">未开启</span></span>
+            </div>
+            <div class="meter" aria-hidden="true">
+              <div class="meter-badge"><svg class="icon"><use href="#i-wave"/></svg></div>
+              <div class="waveform" id="waveform"></div>
+            </div>
+            <div class="response" aria-live="polite">
+              <p id="response-text">停车时开启，之后可以放下手机。</p>
+            </div>
+            <button class="button primary" id="mic-button" type="button"><svg class="icon"><use id="mic-icon" href="#i-mic"/></svg><span id="mic-label">开启感应</span></button>
+            <button class="button secondary" id="demo-button" type="button"><svg class="icon"><use href="#i-play"/></svg><span id="demo-label">模拟鸣笛</span></button>
+            <div class="detector-footer">
+              <label for="sensitivity"><svg class="icon"><use href="#i-sliders"/></svg>识别灵敏度</label>
+              <select id="sensitivity"><option value="low">低</option><option value="normal" selected>标准</option><option value="high">高</option></select>
+            </div>
+          </section>
+
+          <section class="panel voices" aria-labelledby="voices-title">
+            <div class="section-heading">
+              <h2 id="voices-title">安抚语音</h2>
+              <button type="button" class="text-button" id="preview-button"><svg class="icon"><use href="#i-sound"/></svg><span id="preview-label">试听</span></button>
+            </div>
+            <div class="voice-options" role="radiogroup" aria-labelledby="voices-title">
+              <label class="voice-option">
+                <input name="voice" type="radio" value="warm" checked>
+                <span class="voice-art warm"><svg class="icon"><use href="#i-heart"/></svg></span>
+                <span class="voice-meta"><strong>阿暖</strong><span>说句温柔的</span></span>
+                <span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span>
+              </label>
+              <label class="voice-option">
+                <input name="voice" type="radio" value="road">
+                <span class="voice-art road"><svg class="icon"><use href="#i-smile"/></svg></span>
+                <span class="voice-meta"><strong>阿路</strong><span>来点幽默的</span></span>
+                <span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span>
+              </label>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer><svg class="icon"><use href="#i-shield"/></svg><span>麦克风音频在本机处理。感应可能听到附近车辆的喇叭，两次自动安抚至少间隔 45 秒。</span></footer>
+  </div>
+</body>
+</html>

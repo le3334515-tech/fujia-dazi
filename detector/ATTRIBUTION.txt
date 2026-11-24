@@ -1,0 +1,14 @@
+MediaPipe Tasks Audio Web runtime (0.10.32)
+Source: https://www.npmjs.com/package/@mediapipe/tasks-audio/v/0.10.32
+Project: https://github.com/google-ai-edge/mediapipe
+License: Apache License 2.0; see LICENSE.txt in this directory.
+
+YAMNet model
+Source: https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/latest/yamnet.tflite
+Project: https://github.com/tensorflow/models/tree/master/research/audioset/yamnet
+License: Apache License 2.0; see LICENSE.txt in this directory.
+
+Car horn sample: “Car Horn.wav” by 15HPanska_Ruttner_Jan
+Source: https://commons.wikimedia.org/wiki/File:Car_Horn.wav
+License: CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/
+The included copy was converted to mono and reduced in level.
