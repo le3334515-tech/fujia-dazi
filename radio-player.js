@@ -30,9 +30,10 @@
   }
 
   class RadioPlayer {
-    constructor({ section, getAudioContext }) {
+    constructor({ section, getAudioContext, onPlaybackStart }) {
       this.section = section;
       this.getAudioContext = getAudioContext;
+      this.onPlaybackStart = onPlaybackStart;
       this.categoryButtons = [...section.querySelectorAll('[data-radio-category]')];
       this.trackTitle = section.querySelector('#radio-track');
       this.trackMeta = section.querySelector('#radio-meta');
@@ -181,6 +182,7 @@
         this.render();
         return;
       }
+      this.onPlaybackStart?.();
       this.wantsPlayback = true;
       if (!this.isPlaying && !this.loading) void this.prepareTrack();
     }

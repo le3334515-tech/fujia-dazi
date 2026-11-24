@@ -4,14 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4eee2">
-  <meta name="description" content="副驾搭子陪你听段子、故事和脑洞谜题，听到疑似鸣笛时也会轻轻接一句。">
+  <meta name="description" content="副驾搭子有双结局声音盲盒、段子电台和鸣笛安抚，陪你度过路上的无聊时刻。">
   <link rel="canonical" href="https://le3334515-tech.github.io/fujia-dazi/">
   <title>副驾搭子</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=4">
   <script defer src="./horn-detector.js"></script>
-  <script defer src="./radio-player.js"></script>
-  <script defer src="./app.js"></script>
+  <script defer src="./radio-player.js?v=4"></script>
+  <script defer src="./theater-player.js"></script>
+  <script defer src="./app.js?v=4"></script>
   <script defer src="./pit-stop.js"></script>
 </head>
 <body>
@@ -41,7 +42,7 @@
     <header class="topbar">
       <a class="brand" href="#" aria-label="副驾搭子首页"><span class="brand-mark"><svg class="icon"><use href="#i-wave"/></svg></span><span>副驾搭子</span></a>
       <nav class="topnav" aria-label="页面导航">
-        <a href="#radio">解闷电台</a><a href="#detector-panel">鸣笛感应</a><a href="#pit-stop">停车补给</a>
+        <a href="#theater">副驾剧场</a><a href="#radio">解闷电台</a><a href="#detector-panel">鸣笛感应</a><a href="#pit-stop">停车补给</a>
       </nav>
       <div class="share">
         <button class="share-button" id="share-button" type="button"><svg class="icon"><use href="#i-link"/></svg><span id="share-label">复制链接</span></button>
@@ -57,16 +58,46 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-content">
           <h1 id="hero-title">路上无聊？<br><span>听点开心的。</span></h1>
-          <p>路上段子、轻松故事、脑洞谜题，点一下就开播。</p>
+          <p>开一盒双人广播剧，听到最后才知道结局。</p>
           <div class="hero-actions">
-            <button class="hero-play" id="radio-quick-start" type="button"><svg class="icon"><use href="#i-play"/></svg>听个段子</button>
-            <a class="hero-link" href="#pit-stop">停车补给 <svg class="icon"><use href="#i-arrow"/></svg></a>
+            <button class="hero-play" id="theater-quick-start" type="button"><svg class="icon"><use href="#i-spark"/></svg>开个声音盲盒</button>
+            <button class="hero-link" id="radio-quick-start" type="button"><svg class="icon"><use href="#i-play"/></svg>听个段子</button>
           </div>
         </div>
       </section>
 
       <div class="dashboard">
         <div class="main-column">
+          <section class="panel theater" id="theater" aria-labelledby="theater-title" data-theater-state="idle">
+            <div class="section-heading theater-heading">
+              <div>
+                <h2 id="theater-title">副驾剧场</h2>
+                <p>同一个故事，有两个结局。</p>
+              </div>
+            </div>
+            <div class="theater-player">
+              <div class="theater-cover" aria-hidden="true"></div>
+              <div class="theater-content">
+                <div class="theater-now" role="status">
+                  <strong id="theater-episode-title">还没开封</strong>
+                  <p id="theater-status">打开后会自动播完，听完可换一个结局。</p>
+                </div>
+                <progress id="theater-progress" max="1" value="0" aria-label="故事播放进度"></progress>
+                <div class="theater-controls">
+                  <button class="theater-primary" id="theater-open" type="button"><svg class="icon"><use href="#i-spark"/></svg><span id="theater-open-label">开一盒</span></button>
+                  <button class="theater-control" id="theater-pause" type="button" disabled><svg class="icon"><use id="theater-pause-icon" href="#i-play"/></svg><span id="theater-pause-label">播放</span></button>
+                </div>
+              </div>
+            </div>
+            <div class="theater-footer">
+              <button class="theater-control theater-alt" id="theater-alt" type="button" disabled><svg class="icon"><use href="#i-shuffle"/></svg>听另一种结局</button>
+              <details class="theater-collection">
+                <summary><span>结局档案</span><span id="theater-count">0 / 6</span></summary>
+                <ul id="theater-collection" aria-label="已听过的结局"><li>听完的结局会收在这里。</li></ul>
+              </details>
+            </div>
+          </section>
+
           <section class="panel radio" id="radio" aria-labelledby="radio-title">
             <div class="section-heading">
               <div>

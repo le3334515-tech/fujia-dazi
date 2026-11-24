@@ -110,14 +110,28 @@
     }
   }
 
+  async function getPlayerAudioContext() {
+    await unlockAudio();
+    return audioContext;
+  }
+
   const radioSection = document.getElementById('radio');
   const radio = radioSection && window.RadioPlayer ? new window.RadioPlayer({
     section: radioSection,
-    getAudioContext: async () => {
-      await unlockAudio();
-      return audioContext;
-    },
+    getAudioContext: getPlayerAudioContext,
+    onPlaybackStart: () => theater?.stop(),
   }) : null;
+  const theaterSection = document.getElementById('theater');
+  const theater = theaterSection && window.TheaterPlayer ? new window.TheaterPlayer({
+    section: theaterSection,
+    getAudioContext: getPlayerAudioContext,
+    onPlaybackStart: () => radio?.stop(),
+  }) : null;
+
+  function setPlaybackInterruption(interrupted) {
+    radio?.setInterruption(interrupted);
+    theater?.setInterruption(interrupted);
+  }
 
   function loadClip(name) {
     // Text delivery keeps native download handlers from intercepting the audio assets.
@@ -170,7 +184,7 @@
     lastMeterUpdate = -Infinity;
     paintLevel(0);
     render();
-    radio?.setInterruption(false);
+    setPlaybackInterruption(false);
   }
 
   function voiceLine(voice, preview = false) {
@@ -195,7 +209,7 @@
     const voice = selectedVoice;
     const id = ++playbackId;
     operation = 'automatic';
-    radio?.setInterruption(true);
+    setPlaybackInterruption(true);
     message = '听到疑似鸣笛。';
     render();
     animatePlayback();
@@ -285,7 +299,7 @@
     const voice = selectedVoice;
     const id = ++playbackId;
     operation = 'preview';
-    radio?.setInterruption(true);
+    setPlaybackInterruption(true);
     render();
     animatePlayback();
     try {
@@ -302,7 +316,7 @@
     const voice = selectedVoice;
     const id = ++playbackId;
     operation = 'demo-loading';
-    radio?.setInterruption(true);
+    setPlaybackInterruption(true);
     message = '用内置鸣笛样本试一次，无需打开麦克风。';
     render();
     try {
@@ -367,6 +381,7 @@
   window.addEventListener('pagehide', () => {
     micRequest += 1;
     radio?.stop();
+    theater?.stop();
     detector?.stop();
     playingSource?.stop();
     micState = 'idle';
