@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4eee2">
-  <meta name="description" content="副驾搭子有双结局声音盲盒、段子电台和鸣笛安抚，陪你度过路上的无聊时刻。">
+  <meta name="description" content="副驾搭子有音乐、短节目、双结局声音盲盒和鸣笛安抚，还可以打开百度地图查看驾车路线。">
   <link rel="canonical" href="https://le3334515-tech.github.io/fujia-dazi/">
   <title>副驾搭子</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./style.css?v=4">
+  <link rel="stylesheet" href="./style.css?v=5">
   <script defer src="./horn-detector.js"></script>
-  <script defer src="./radio-player.js?v=4"></script>
-  <script defer src="./theater-player.js"></script>
-  <script defer src="./app.js?v=4"></script>
+  <script defer src="./radio-player.js?v=5"></script>
+  <script defer src="./theater-player.js?v=5"></script>
+  <script defer src="./app.js?v=5"></script>
   <script defer src="./pit-stop.js"></script>
+  <script defer src="./navigation.js"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -36,13 +37,15 @@
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></symbol>
     <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5Zm13 1h2a2.5 2.5 0 0 1 0 5h-2M3 22h17M9 2v3m4-3v3"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12M9 10l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13"/></symbol>
   </svg>
 
   <div class="shell">
     <header class="topbar">
       <a class="brand" href="#" aria-label="副驾搭子首页"><span class="brand-mark"><svg class="icon"><use href="#i-wave"/></svg></span><span>副驾搭子</span></a>
       <nav class="topnav" aria-label="页面导航">
-        <a href="#theater">副驾剧场</a><a href="#radio">解闷电台</a><a href="#detector-panel">鸣笛感应</a><a href="#pit-stop">停车补给</a>
+        <a href="#theater">副驾剧场</a><a href="#radio">解闷电台</a><a href="#navigation">驾车路线</a><a href="#detector-panel">鸣笛安抚</a><a href="#pit-stop">停车补给</a>
       </nav>
       <div class="share">
         <button class="share-button" id="share-button" type="button"><svg class="icon"><use href="#i-link"/></svg><span id="share-label">复制链接</span></button>
@@ -58,10 +61,11 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-content">
           <h1 id="hero-title">路上无聊？<br><span>听点开心的。</span></h1>
-          <p>开一盒双人广播剧，听到最后才知道结局。</p>
+          <p>听点音乐，开个盲盒，或者出发前查好路线。</p>
           <div class="hero-actions">
             <button class="hero-play" id="theater-quick-start" type="button"><svg class="icon"><use href="#i-spark"/></svg>开个声音盲盒</button>
             <button class="hero-link" id="radio-quick-start" type="button"><svg class="icon"><use href="#i-play"/></svg>听个段子</button>
+            <a class="hero-link hero-route" href="#navigation"><svg class="icon"><use href="#i-map"/></svg>查驾车路线</a>
           </div>
         </div>
       </section>
@@ -102,11 +106,14 @@
             <div class="section-heading">
               <div>
                 <h2 id="radio-title">解闷电台</h2>
-                <p>选好一组，节目就会接着播。</p>
+                <p>音乐和短节目，选好一组就能连播。</p>
               </div>
               <button type="button" class="favorite-library" data-radio-category="favorites" aria-pressed="false"><svg class="icon"><use href="#i-heart"/></svg>我的收藏</button>
             </div>
             <div class="radio-categories" role="group" aria-label="节目分类">
+              <button type="button" class="radio-category category-music" data-radio-category="music" aria-pressed="false">
+                <svg class="icon"><use href="#i-note"/></svg><span>公路音乐</span>
+              </button>
               <button type="button" class="radio-category category-jokes" data-radio-category="jokes" aria-pressed="false">
                 <svg class="icon"><use href="#i-smile"/></svg><span>路上段子</span>
               </button>
@@ -179,22 +186,53 @@
         <div class="side-column">
           <section class="panel detector" id="detector-panel" data-state="idle" aria-labelledby="detector-title">
             <div class="section-heading">
-              <h2 id="detector-title">鸣笛感应</h2>
+              <h2 id="detector-title">鸣笛安抚</h2>
               <span id="status-pill" class="status-pill" role="status"><i></i><span id="status-label">未开启</span></span>
             </div>
+            <p class="detector-explain">听到疑似汽车喇叭，就播一句安抚语音。</p>
             <div class="meter" aria-hidden="true">
               <div class="meter-badge"><svg class="icon"><use href="#i-wave"/></svg></div>
               <div class="waveform" id="waveform"></div>
             </div>
             <div class="response" aria-live="polite">
-              <p id="response-text">停车时开启，之后可以放下手机。</p>
+              <p id="response-text">停车后开启，浏览器会询问麦克风权限。</p>
             </div>
-            <button class="button primary" id="mic-button" type="button"><svg class="icon"><use id="mic-icon" href="#i-mic"/></svg><span id="mic-label">开启感应</span></button>
-            <button class="button secondary" id="demo-button" type="button"><svg class="icon"><use href="#i-play"/></svg><span id="demo-label">模拟鸣笛</span></button>
+            <button class="button primary" id="mic-button" type="button"><svg class="icon"><use id="mic-icon" href="#i-mic"/></svg><span id="mic-label">开启麦克风感应</span></button>
+            <button class="button secondary" id="demo-button" type="button"><svg class="icon"><use href="#i-play"/></svg><span id="demo-label">先试听一次</span></button>
+            <details class="detector-guide">
+              <summary>它怎么工作？</summary>
+              <ul>
+                <li>「先试听一次」会播放一声示例喇叭，再播一句安抚，无需开麦克风。</li>
+                <li>开启后请保持页面打开。附近车的喇叭也可能触发，两次自动语音至少间隔 45 秒。</li>
+                <li>如果音乐或故事正在播放，会先暂停，安抚结束后接着播。</li>
+              </ul>
+            </details>
             <div class="detector-footer">
               <label for="sensitivity"><svg class="icon"><use href="#i-sliders"/></svg>识别灵敏度</label>
               <select id="sensitivity"><option value="low">低</option><option value="normal" selected>标准</option><option value="high">高</option></select>
             </div>
+          </section>
+
+          <section class="panel navigation" id="navigation" aria-labelledby="navigation-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="navigation-title">驾车路线</h2>
+                <p>出发前查同城路线，交给百度地图导航。</p>
+              </div>
+              <span class="navigation-mark" aria-hidden="true"><svg class="icon"><use href="#i-map"/></svg></span>
+            </div>
+            <form id="navigation-form" class="navigation-form" novalidate>
+              <label for="nav-city">城市</label>
+              <input id="nav-city" type="text" placeholder="例如深圳" maxlength="30" autocomplete="off" required>
+              <label for="nav-origin">出发地</label>
+              <input id="nav-origin" type="text" placeholder="例如深圳北站" maxlength="100" autocomplete="off" required>
+              <label for="nav-destination">目的地</label>
+              <input id="nav-destination" type="text" placeholder="例如深圳湾公园" maxlength="100" autocomplete="off" required>
+              <button class="button primary" id="nav-submit" type="submit"><svg class="icon"><use href="#i-map"/></svg>在百度地图看路线</button>
+              <p class="navigation-note">打开时，地点信息会发送给百度地图。</p>
+              <p id="nav-status" class="navigation-status" role="status"></p>
+              <a id="nav-fallback" class="navigation-fallback" target="_blank" rel="noopener noreferrer" hidden>手动打开百度地图</a>
+            </form>
           </section>
 
           <section class="panel voices" aria-labelledby="voices-title">
@@ -221,7 +259,7 @@
       </div>
     </main>
 
-    <footer><svg class="icon"><use href="#i-shield"/></svg><span>麦克风音频在本机处理。感应可能听到附近车辆的喇叭，两次自动安抚至少间隔 45 秒。</span></footer>
+    <footer><svg class="icon"><use href="#i-shield"/></svg><span>麦克风音频在本机处理。</span></footer>
   </div>
 </body>
 </html>

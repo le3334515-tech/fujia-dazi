@@ -1,8 +1,17 @@
 (() => {
   'use strict';
 
-  const catalogCategories = ['jokes', 'stories', 'riddles'];
+  const catalogs = {
+    spoken: { url: './radio/playlist.json?v=5', categories: ['jokes', 'stories', 'riddles'] },
+    music: { url: './radio/music.json', categories: ['music'] },
+  };
+  const catalogCategories = Object.values(catalogs).flatMap(({ categories }) => categories);
   const favoritesKey = 'fujia-radio-favorites';
+  const musicPrefix = 'music:';
+
+  function trackKey(track) {
+    return track.category === 'music' ? musicPrefix + track.id : track.id;
+  }
 
   function readFavorites() {
     try {
@@ -52,6 +61,7 @@
       this.categoryTracks = null;
       this.tracks = [];
       this.buffers = new Map();
+      this.catalogRequests = new Map();
       this.index = 0;
       this.offset = 0;
       this.request = 0;
@@ -83,36 +93,48 @@
       return Boolean(this.playback);
     }
 
-    loadPlaylist() {
-      this.playlist ||= fetch('./radio/playlist.json').then(async (response) => {
+    loadPlaylist(catalog) {
+      if (this.catalogRequests.has(catalog)) return this.catalogRequests.get(catalog);
+      const { url, categories } = catalogs[catalog];
+      const pending = fetch(url).then(async (response) => {
         if (!response.ok) throw new Error('Radio playlist unavailable');
         const { tracks } = await response.json();
         if (!Array.isArray(tracks)) throw new Error('Invalid radio playlist');
         const valid = tracks.filter((track) => typeof track?.id === 'string'
-          && catalogCategories.includes(track.category) && typeof track.title === 'string'
+          && track.id.length > 0 && categories.includes(track.category) && typeof track.title === 'string'
           && typeof track.voice === 'string' && typeof track.duration === 'number'
           && track.duration > 0 && typeof track.audio === 'string' && track.audio.length > 0);
         if (!valid.length) throw new Error('Radio playlist is empty');
         return valid;
       }).catch((error) => {
-        this.playlist = undefined;
+        this.catalogRequests.delete(catalog);
         throw error;
       });
-      return this.playlist;
+      this.catalogRequests.set(catalog, pending);
+      return pending;
+    }
+
+    async loadSelectedTracks() {
+      if (this.category !== 'favorites') {
+        return this.loadPlaylist(this.category === 'music' ? 'music' : 'spoken');
+      }
+      const sources = new Set([...this.favoriteIds].map((id) => id.startsWith(musicPrefix) ? 'music' : 'spoken'));
+      return (await Promise.all([...sources].map((catalog) => this.loadPlaylist(catalog)))).flat();
     }
 
     decodeTrack(track, context) {
-      if (!this.buffers.has(track.id)) {
+      const key = trackKey(track);
+      if (!this.buffers.has(key)) {
         const pending = Promise.resolve().then(() => {
           const bytes = Uint8Array.from(atob(track.audio), (character) => character.charCodeAt(0));
           return context.decodeAudioData(bytes.buffer);
         }).catch((error) => {
-          this.buffers.delete(track.id);
+          this.buffers.delete(key);
           throw error;
         });
-        this.buffers.set(track.id, pending);
+        this.buffers.set(key, pending);
       }
-      return this.buffers.get(track.id);
+      return this.buffers.get(key);
     }
 
     selectCategory(category) {
@@ -135,7 +157,7 @@
 
     loadQueue(playlist) {
       if (this.category === 'favorites') {
-        const byId = new Map(playlist.map((track) => [track.id, track]));
+        const byId = new Map(playlist.map((track) => [trackKey(track), track]));
         this.categoryTracks = [...this.favoriteIds].map((id) => byId.get(id)).filter(Boolean);
       } else {
         this.categoryTracks = playlist.filter((track) => track.category === this.category);
@@ -158,7 +180,8 @@
     toggleFavorite() {
       const track = this.currentTrack;
       if (!track) return;
-      if (!this.favoriteIds.delete(track.id)) this.favoriteIds.add(track.id);
+      const key = trackKey(track);
+      if (!this.favoriteIds.delete(key)) this.favoriteIds.add(key);
       try {
         localStorage.setItem(favoritesKey, JSON.stringify([...this.favoriteIds]));
       } catch { /* Favorites still apply for this visit. */ }
@@ -225,7 +248,9 @@
       this.loading = true;
       this.render();
       try {
-        const [context, playlist] = await Promise.all([this.getAudioContext(), this.loadPlaylist()]);
+        const [context, playlist] = await Promise.all([
+          this.getAudioContext(), this.categoryTracks ? null : this.loadSelectedTracks(),
+        ]);
         if (request !== this.request) return;
         if (!this.categoryTracks) this.loadQueue(playlist);
         const track = this.currentTrack;
@@ -330,7 +355,7 @@
       this.next.disabled = this.index + 1 >= this.tracks.length;
       const position = track ? `${this.index + 1} / ${this.tracks.length}` : '';
       if (this.counter.textContent !== position) this.counter.textContent = position;
-      const favorited = Boolean(track && this.favoriteIds.has(track.id));
+      const favorited = Boolean(track && this.favoriteIds.has(trackKey(track)));
       if (this.favorite) {
         this.favorite.disabled = !track;
         this.favorite.setAttribute('aria-pressed', String(favorited));

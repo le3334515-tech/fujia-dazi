@@ -14,6 +14,7 @@
     }
   };
   const cooldownMs = 45_000;
+  const idleMicMessage = '停车后开启，浏览器会询问麦克风权限。';
   const panel = document.getElementById('detector-panel');
   const statusLabel = document.getElementById('status-label');
   const micButton = document.getElementById('mic-button');
@@ -45,7 +46,7 @@
   let micRequest = 0;
   let lastHorn = -Infinity;
   let ignoreUntil = 0;
-  let message = '停车时开启，之后可以放下手机。';
+  let message = idleMicMessage;
   let lastMeterUpdate = -Infinity;
   let replyAnimation;
 
@@ -73,11 +74,11 @@
       idle: '未开启', loading: '正在开启', listening: '正在感应', replying: '正在播放', error: '感应未开启'
     }[state];
     if (responseText.textContent !== message) responseText.textContent = message;
-    micLabel.textContent = { idle: '开启感应', loading: '取消开启', listening: '关闭感应', error: '重新开启感应' }[micState];
+    micLabel.textContent = { idle: '开启麦克风感应', loading: '取消开启', listening: '关闭感应', error: '重新开启感应' }[micState];
     micIcon.setAttribute('href', ['loading', 'listening'].includes(micState) ? '#i-stop' : '#i-mic');
     demoButton.disabled = Boolean(operation) || micState === 'loading';
     previewButton.disabled = demoButton.disabled;
-    demoLabel.textContent = operation === 'demo-loading' ? '正在识别样本…' : operation === 'demo' ? '正在模拟…' : '模拟鸣笛';
+    demoLabel.textContent = operation === 'demo-loading' ? '正在识别样本…' : operation === 'demo' ? '正在试听…' : '先试听一次';
     previewLabel.textContent = operation === 'preview' ? '正在试听…' : '试听语音';
   }
 
@@ -135,7 +136,7 @@
 
   function loadClip(name) {
     // Text delivery keeps native download handlers from intercepting the audio assets.
-    clipData ||= fetch('./voice/clips.json').then((response) => {
+    clipData ||= fetch('./voice/clips.json?v=5').then((response) => {
       if (!response.ok) throw new Error(`Audio request returned ${response.status}`);
       return response.json();
     }).catch((error) => {
@@ -228,7 +229,7 @@
     message = ({
       NotAllowedError: '未获得麦克风权限。允许访问后，可以再开一次。',
       SecurityError: '浏览器限制了麦克风。请在独立浏览器标签页打开。',
-      NotFoundError: '没有找到可用的麦克风。你也可以先模拟鸣笛。',
+      NotFoundError: '没有找到可用的麦克风。你可以先试听安抚。',
       NotReadableError: '麦克风暂时不可用。请检查设备后再试。'
     })[error?.name] || '感应暂停了。请检查麦克风权限和网络后重试。';
     paintLevel(0);
@@ -385,7 +386,7 @@
     detector?.stop();
     playingSource?.stop();
     micState = 'idle';
-    message = '停车时开启，之后可以放下手机。';
+    message = idleMicMessage;
     playbackFinished();
   });
 

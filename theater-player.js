@@ -82,7 +82,7 @@
     }
 
     loadEpisodes() {
-      this.catalogRequest ||= fetch('./theater/episodes.json').then(async (response) => {
+      this.catalogRequest ||= fetch('./theater/episodes.json?v=5').then(async (response) => {
         if (!response.ok) throw new Error('Theater manifest unavailable');
         const { episodes } = await response.json();
         const valid = Array.isArray(episodes) ? episodes.filter((episode) => validId(episode?.id)
