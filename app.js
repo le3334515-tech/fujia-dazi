@@ -49,6 +49,7 @@
   let message = idleMicMessage;
   let lastMeterUpdate = -Infinity;
   let replyAnimation;
+  let voiceVolume = .88;
 
   function readPreference(key, fallback) {
     try { return localStorage.getItem(key) || fallback; }
@@ -146,7 +147,9 @@
     if (!clipBuffers.has(name)) {
       const pending = clipData.then((clips) => {
         if (!Object.hasOwn(clips, name)) throw new Error('Audio clip missing');
-        const bytes = Uint8Array.from(atob(clips[name]), (character) => character.charCodeAt(0));
+        const binary = atob(clips[name]);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
         return audioContext.decodeAudioData(bytes.buffer);
       }).catch((error) => {
         clipBuffers.delete(name);
@@ -157,7 +160,7 @@
     return clipBuffers.get(name);
   }
 
-  async function playClip(clip, volume = .88) {
+  async function playClip(clip, volume = voiceVolume) {
     if (audioContext.state !== 'running') throw new Error('Audio playback suspended');
     const source = audioContext.createBufferSource();
     const gain = audioContext.createGain();
@@ -389,6 +392,16 @@
     message = idleMicMessage;
     playbackFinished();
   });
+
+  window.fujiaCompanion = {
+    radio,
+    theater,
+    setVolume(volume) {
+      voiceVolume = Math.max(0, Math.min(1, volume));
+      radio?.setVolume(voiceVolume);
+      theater?.setVolume(voiceVolume);
+    },
+  };
 
   render();
 })();

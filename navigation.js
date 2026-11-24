@@ -23,6 +23,7 @@
   form.addEventListener('input', () => {
     hideLink();
     setStatus('');
+    for (const field of [city, origin, destination]) field.removeAttribute('aria-invalid');
   });
 
   form.addEventListener('submit', (event) => {
@@ -33,11 +34,14 @@
     const destinationText = destination.value.trim();
     if (!region || !destinationText) {
       setStatus('请填写城市和目的地。', 'error');
+      city.setAttribute('aria-invalid', String(!region));
+      destination.setAttribute('aria-invalid', String(!destinationText));
       (region ? destination : city).focus();
       return;
     }
-    if (!originText || originText === '我的位置') {
-      setStatus('请填写起点的地点名称或地址。', 'error');
+    if (!originText) {
+      setStatus('请填写起点，或点击「用当前位置」。', 'error');
+      origin.setAttribute('aria-invalid', 'true');
       origin.focus();
       return;
     }
@@ -56,6 +60,7 @@
     fallback.href = url.href;
     fallback.hidden = false;
     setStatus('已准备好驾车路线链接。', 'ready');
+    window.dispatchEvent(new CustomEvent('fujia:route', { detail: { city: region, origin: originText, destination: destinationText, url: url.href } }));
     fallback.click();
   });
 })();

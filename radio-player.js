@@ -51,6 +51,7 @@
       this.playLabel = section.querySelector('#radio-play-label');
       this.playIcon = section.querySelector('#radio-play-icon');
       this.next = section.querySelector('#radio-next');
+      this.previous = section.querySelector('#radio-previous');
       this.counter = section.querySelector('#radio-counter');
       this.shuffle = section.querySelector('#radio-shuffle');
       this.shuffleLabel = section.querySelector('#radio-shuffle-label');
@@ -70,11 +71,13 @@
       this.loading = false;
       this.finished = false;
       this.failed = false;
+      this.volume = .72;
 
       for (const button of this.categoryButtons) {
         button.addEventListener('click', () => this.selectCategory(button.dataset.radioCategory));
       }
       this.play.addEventListener('click', () => this.togglePlayback());
+      this.previous?.addEventListener('click', () => this.previousTrack());
       this.next.addEventListener('click', () => this.advance());
       this.shuffle?.addEventListener('click', () => this.toggleShuffle());
       this.favorite?.addEventListener('click', () => this.toggleFavorite());
@@ -126,7 +129,9 @@
       const key = trackKey(track);
       if (!this.buffers.has(key)) {
         const pending = Promise.resolve().then(() => {
-          const bytes = Uint8Array.from(atob(track.audio), (character) => character.charCodeAt(0));
+          const binary = atob(track.audio);
+          const bytes = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
           return context.decodeAudioData(bytes.buffer);
         }).catch((error) => {
           this.buffers.delete(key);
@@ -197,6 +202,7 @@
     }
 
     start() {
+      window.dispatchEvent(new CustomEvent('fujia:activate', { detail: { kind: 'radio' } }));
       if (this.finished) this.resetQueue();
       this.failed = false;
       if (this.category === 'favorites' && !this.favoriteIds.size && !this.currentTrack) {
@@ -230,6 +236,82 @@
       this.failed = false;
       if (this.wantsPlayback) void this.prepareTrack();
       else this.render();
+    }
+
+    previousTrack() {
+      const playback = this.playback;
+      const position = playback ? playback.context.currentTime - playback.startedAt : this.offset;
+      if (position > 3) {
+        this.seek(0);
+        return;
+      }
+      if (this.index > 0) {
+        this.cancelRequest();
+        this.index -= 1;
+        this.offset = 0;
+        this.failed = false;
+        if (this.wantsPlayback) void this.prepareTrack();
+        else this.render();
+      }
+    }
+
+    playTrackAt(index) {
+      if (!Number.isInteger(index) || index < 0 || index >= this.tracks.length) return;
+      this.cancelRequest();
+      this.index = index;
+      this.offset = 0;
+      this.finished = false;
+      this.failed = false;
+      this.start();
+    }
+
+    seek(ratio) {
+      const track = this.currentTrack;
+      if (!track) return;
+      const playback = this.playback;
+      if (playback) {
+        const { source, context } = playback;
+        const clip = source.buffer;
+        const offset = Math.max(0, Math.min(clip.duration - .02, ratio * clip.duration));
+        this.stopSource();
+        this.offset = offset;
+        if (this.wantsPlayback && !this.interrupted) this.playSource(clip, context);
+        else this.render();
+        return;
+      }
+      this.offset = Math.max(0, Math.min(track.duration, ratio * track.duration));
+      this.render();
+    }
+
+    setVolume(volume) {
+      this.volume = Math.max(0, Math.min(1, volume));
+      if (this.playback) this.playback.gain.gain.setTargetAtTime(this.volume, this.playback.context.currentTime, .02);
+    }
+
+    getSnapshot() {
+      const track = this.currentTrack;
+      return {
+        kind: 'radio',
+        loaded: Boolean(track),
+        state: this.section.dataset.radioState,
+        title: track?.title || '',
+        meta: track ? `${track.voice} · ${formatDuration(track.duration)}` : '',
+        duration: track?.duration || 0,
+        progress: Number(this.progress.value) || 0,
+        canSeek: Boolean(track),
+        canPrevious: Boolean(track && (this.index > 0 || Number(this.progress.value) * (this.playback?.duration || track.duration) > 3)),
+        canNext: this.index + 1 < this.tracks.length,
+        transcript: track?.transcript || '',
+        category: this.category || '',
+        tracks: this.tracks.map((item, index) => ({
+          id: trackKey(item), title: item.title, meta: item.voice, duration: item.duration, index,
+        })),
+        currentIndex: this.index,
+      };
+    }
+
+    emitState() {
+      window.dispatchEvent(new CustomEvent('fujia:state', { detail: this.getSnapshot() }));
     }
 
     setInterruption(interrupted) {
@@ -279,7 +361,7 @@
       const source = context.createBufferSource();
       const gain = context.createGain();
       source.buffer = clip;
-      gain.gain.value = .72;
+      gain.gain.value = this.volume;
       source.connect(gain).connect(context.destination);
       const offset = Math.min(this.offset, clip.duration);
       try {
@@ -353,6 +435,7 @@
       this.playIcon.setAttribute('href', this.wantsPlayback ? '#i-pause' : '#i-play');
       this.play.disabled = state === 'empty';
       this.next.disabled = this.index + 1 >= this.tracks.length;
+      if (this.previous) this.previous.disabled = this.index === 0 && Number(this.progress.value) * (this.playback?.duration || this.currentTrack?.duration || 1) <= 3;
       const position = track ? `${this.index + 1} / ${this.tracks.length}` : '';
       if (this.counter.textContent !== position) this.counter.textContent = position;
       const favorited = Boolean(track && this.favoriteIds.has(trackKey(track)));
@@ -367,6 +450,7 @@
         button.setAttribute('aria-pressed', String(button.dataset.radioCategory === this.category));
       }
       this.paintProgress();
+      this.emitState();
     }
   }
 

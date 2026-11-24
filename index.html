@@ -2,19 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4eee2">
-  <meta name="description" content="副驾搭子有音乐、短节目、双结局声音盲盒和鸣笛安抚，还可以打开百度地图查看驾车路线。">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17281f">
+  <meta name="description" content="副驾搭子：公路音乐、声音盲盒、双结局故事、鸣笛安抚与停车补给。请先停稳再操作。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="canonical" href="https://le3334515-tech.github.io/fujia-dazi/">
-  <title>副驾搭子</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./style.css?v=5">
-  <script defer src="./horn-detector.js"></script>
-  <script defer src="./radio-player.js?v=5"></script>
-  <script defer src="./theater-player.js?v=5"></script>
-  <script defer src="./app.js?v=5"></script>
-  <script defer src="./pit-stop.js"></script>
-  <script defer src="./navigation.js"></script>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="preload" as="image" href="./coastal-drive.webp">
+  <title>副驾搭子 · 把这一程听成喜欢的样子</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('fujia-theme')||'light'}catch{}</script>
+  <link rel="stylesheet" href="./style.css?v=7">
+  <link rel="stylesheet" href="./polish.css?v=7">
+  <script defer src="./horn-detector.js?v=7"></script>
+  <script defer src="./radio-player.js?v=7"></script>
+  <script defer src="./theater-player.js?v=7"></script>
+  <script defer src="./app.js?v=7"></script>
+  <script defer src="./pit-stop.js?v=7"></script>
+  <script defer src="./navigation.js?v=7"></script>
+  <script defer src="./player-shell.js?v=7"></script>
+  <script defer src="./trip-tools.js?v=7"></script>
+  <script defer src="./rest-tools.js?v=7"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -25,6 +34,7 @@
     <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="m6 6 9 6-9 6Zm12 0v12"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="m18 6-9 6 9 6ZM6 6v12"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v13"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6m2.8-8.8a8 8 0 0 1 0 11.6"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.5 8.5c0 4.6-8.5 9.8-8.5 9.8s-8.5-5.2-8.5-9.8A4.5 4.5 0 0 1 12 6.4a4.5 4.5 0 0 1 8.5 2.1Z"/></symbol>
@@ -39,20 +49,34 @@
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
     <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12M9 10l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></symbol>
     <symbol id="i-map" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4C10 3 4 7 4 13a6 6 0 0 0 6 6c6 0 10-6 10-15Z"/><path d="M4 21 15 10"/></symbol>
   </svg>
 
-  <div class="shell">
+  <div class="shell" id="app-shell">
     <header class="topbar">
-      <a class="brand" href="#" aria-label="副驾搭子首页"><span class="brand-mark"><svg class="icon"><use href="#i-wave"/></svg></span><span>副驾搭子</span></a>
+      <a class="brand" href="#" aria-label="副驾搭子首页">
+        <span class="brand-mark"><svg class="icon"><use href="#i-wave"/></svg></span>
+        <span class="brand-copy"><strong>副驾搭子</strong><small>YOUR ROAD COMPANION</small></span>
+      </a>
       <nav class="topnav" aria-label="页面导航">
         <a href="#theater">副驾剧场</a><a href="#radio">解闷电台</a><a href="#navigation">驾车路线</a><a href="#detector-panel">鸣笛安抚</a><a href="#pit-stop">停车补给</a>
       </nav>
-      <div class="share">
-        <button class="share-button" id="share-button" type="button"><svg class="icon"><use href="#i-link"/></svg><span id="share-label">复制链接</span></button>
-        <span id="share-status" class="visually-hidden" role="status"></span>
-        <div class="share-fallback" id="share-fallback" hidden>
-          <label for="share-url">长按或选中复制公开链接</label>
-          <input id="share-url" type="url" readonly>
+      <div class="header-tools">
+        <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="icon"><use id="theme-icon" href="#i-moon"/></svg></button>
+        <div class="share">
+          <button class="share-button" id="share-button" type="button"><svg class="icon"><use href="#i-link"/></svg><span id="share-label">分享</span></button>
+          <span id="share-status" class="visually-hidden" role="status"></span>
+          <div class="share-fallback" id="share-fallback" hidden>
+            <label for="share-url">长按或选中复制公开链接</label>
+            <input id="share-url" type="url" readonly>
+          </div>
         </div>
       </div>
     </header>
@@ -60,80 +84,70 @@
     <main>
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-content">
+          <p class="eyebrow"><span class="live-dot"></span> DRIVE EASY · 一路有伴</p>
           <h1 id="hero-title">路上无聊？<br><span>听点开心的。</span></h1>
-          <p>听点音乐，开个盲盒，或者出发前查好路线。</p>
+          <p class="hero-description">音乐、故事和一点幽默，把普通的一程听得有意思。</p>
           <div class="hero-actions">
             <button class="hero-play" id="theater-quick-start" type="button"><svg class="icon"><use href="#i-spark"/></svg>开个声音盲盒</button>
             <button class="hero-link" id="radio-quick-start" type="button"><svg class="icon"><use href="#i-play"/></svg>听个段子</button>
             <a class="hero-link hero-route" href="#navigation"><svg class="icon"><use href="#i-map"/></svg>查驾车路线</a>
           </div>
+          <p class="safety-note"><svg class="icon"><use href="#i-shield"/></svg>请先停稳，再操作屏幕</p>
         </div>
+        <div class="hero-stamp" aria-hidden="true"><span>COASTLINE</span><strong>18:42</strong><small>GOOD VIBES ONLY</small></div>
+        <div class="hero-index" aria-hidden="true">01 <span>/ 05</span></div>
       </section>
+
+      <nav class="mode-rail" aria-label="快捷场景">
+        <a href="#radio"><span class="mode-number">01</span><span><strong>现在想听点什么</strong><small>音乐 · 段子 · 故事 · 谜题</small></span><svg class="icon"><use href="#i-arrow"/></svg></a>
+        <a href="#pit-stop"><span class="mode-number">02</span><span><strong>停稳了，缓一缓</strong><small>一句话 · 一分钟呼吸</small></span><svg class="icon"><use href="#i-arrow"/></svg></a>
+        <a href="#navigation"><span class="mode-number">03</span><span><strong>下一站，去哪里</strong><small>路线 · 定位 · 最近行程</small></span><svg class="icon"><use href="#i-arrow"/></svg></a>
+      </nav>
 
       <div class="dashboard">
         <div class="main-column">
           <section class="panel theater" id="theater" aria-labelledby="theater-title" data-theater-state="idle">
             <div class="section-heading theater-heading">
-              <div>
-                <h2 id="theater-title">副驾剧场</h2>
-                <p>同一个故事，有两个结局。</p>
-              </div>
+              <div><p class="section-kicker">AUDIO BLIND BOX</p><h2 id="theater-title">副驾剧场</h2><p>同一个故事，藏着一个意想不到的结局。</p></div>
+              <span class="edition-badge">VOL. 03</span>
             </div>
             <div class="theater-player">
-              <div class="theater-cover" aria-hidden="true"></div>
+              <div class="theater-cover" aria-hidden="true"><span>OPEN<br>ME</span></div>
               <div class="theater-content">
-                <div class="theater-now" role="status">
-                  <strong id="theater-episode-title">还没开封</strong>
-                  <p id="theater-status">打开后会自动播完，听完可换一个结局。</p>
-                </div>
+                <div class="theater-now" role="status"><strong id="theater-episode-title">盲盒里有什么？</strong><p id="theater-status">停车时选好，故事和随机结局会接着播放。</p></div>
                 <progress id="theater-progress" max="1" value="0" aria-label="故事播放进度"></progress>
                 <div class="theater-controls">
                   <button class="theater-primary" id="theater-open" type="button"><svg class="icon"><use href="#i-spark"/></svg><span id="theater-open-label">开一盒</span></button>
-                  <button class="theater-control" id="theater-pause" type="button" disabled><svg class="icon"><use id="theater-pause-icon" href="#i-play"/></svg><span id="theater-pause-label">播放</span></button>
+                  <button class="theater-control" id="theater-pause" type="button" disabled><svg class="icon"><use id="theater-pause-icon" href="#i-play"/></svg><span id="theater-pause-label">继续播放</span></button>
                 </div>
               </div>
             </div>
             <div class="theater-footer">
               <button class="theater-control theater-alt" id="theater-alt" type="button" disabled><svg class="icon"><use href="#i-shuffle"/></svg>听另一种结局</button>
-              <details class="theater-collection">
-                <summary><span>结局档案</span><span id="theater-count">0 / 6</span></summary>
-                <ul id="theater-collection" aria-label="已听过的结局"><li>听完的结局会收在这里。</li></ul>
-              </details>
+              <details class="theater-collection"><summary><span>结局档案</span><span id="theater-count">0 / 6</span></summary><ul id="theater-collection" aria-label="已听过的结局"><li>听完的结局会收在这里。</li></ul></details>
             </div>
           </section>
 
           <section class="panel radio" id="radio" aria-labelledby="radio-title">
             <div class="section-heading">
-              <div>
-                <h2 id="radio-title">解闷电台</h2>
-                <p>音乐和短节目，选好一组就能连播。</p>
-              </div>
+              <div><p class="section-kicker">ON-AIR RADIO</p><h2 id="radio-title">解闷电台</h2><p>选一组声音，让这一程自己流动。</p></div>
               <button type="button" class="favorite-library" data-radio-category="favorites" aria-pressed="false"><svg class="icon"><use href="#i-heart"/></svg>我的收藏</button>
             </div>
             <div class="radio-categories" role="group" aria-label="节目分类">
-              <button type="button" class="radio-category category-music" data-radio-category="music" aria-pressed="false">
-                <svg class="icon"><use href="#i-note"/></svg><span>公路音乐</span>
-              </button>
-              <button type="button" class="radio-category category-jokes" data-radio-category="jokes" aria-pressed="false">
-                <svg class="icon"><use href="#i-smile"/></svg><span>路上段子</span>
-              </button>
-              <button type="button" class="radio-category category-stories" data-radio-category="stories" aria-pressed="false">
-                <svg class="icon"><use href="#i-book"/></svg><span>轻松故事</span>
-              </button>
-              <button type="button" class="radio-category category-riddles" data-radio-category="riddles" aria-pressed="false">
-                <svg class="icon"><use href="#i-spark"/></svg><span>脑洞谜题</span>
-              </button>
+              <button type="button" class="radio-category category-music" data-radio-category="music" aria-pressed="false"><svg class="icon"><use href="#i-note"/></svg><span>公路音乐</span><small>纯音乐</small></button>
+              <button type="button" class="radio-category category-jokes" data-radio-category="jokes" aria-pressed="false"><svg class="icon"><use href="#i-smile"/></svg><span>路上段子</span><small>轻松一下</small></button>
+              <button type="button" class="radio-category category-stories" data-radio-category="stories" aria-pressed="false"><svg class="icon"><use href="#i-book"/></svg><span>轻松故事</span><small>温暖短篇</small></button>
+              <button type="button" class="radio-category category-riddles" data-radio-category="riddles" aria-pressed="false"><svg class="icon"><use href="#i-spark"/></svg><span>脑洞谜题</span><small>猜一猜</small></button>
             </div>
             <div class="radio-player">
               <div class="radio-art" aria-hidden="true"><svg class="icon"><use href="#i-wave"/></svg></div>
               <div class="radio-info">
-                <div class="radio-current" role="status">
-                  <strong id="radio-track">想听点什么？</strong><span id="radio-counter"></span>
-                </div>
+                <div class="radio-current" role="status"><strong id="radio-track">想听点什么？</strong><span id="radio-counter"></span></div>
                 <p id="radio-meta">听电台无需开启麦克风。</p>
                 <progress id="radio-progress" max="1" value="0" aria-label="播放进度"></progress>
               </div>
               <div class="radio-controls">
+                <button class="radio-control radio-previous" id="radio-previous" type="button" disabled aria-label="上一段"><svg class="icon"><use href="#i-prev"/></svg></button>
                 <button class="radio-control radio-control-main" id="radio-play" type="button"><svg class="icon"><use id="radio-play-icon" href="#i-play"/></svg><span id="radio-play-label">播放</span></button>
                 <button class="radio-control" id="radio-next" type="button" disabled><svg class="icon"><use href="#i-next"/></svg>下一段</button>
               </div>
@@ -141,125 +155,92 @@
             <div class="radio-actions">
               <button class="tool-button" id="radio-shuffle" type="button" aria-pressed="false"><svg class="icon"><use href="#i-shuffle"/></svg><span id="radio-shuffle-label">随机播放</span></button>
               <button class="tool-button" id="radio-favorite" type="button" aria-pressed="false" disabled><svg class="icon"><use href="#i-heart"/></svg><span id="radio-favorite-label">收藏这段</span></button>
+              <span class="radio-hint"><span class="on-air-dot"></span> 17 段声音，随时开播</span>
             </div>
           </section>
 
           <section class="panel pit" id="pit-stop" aria-labelledby="pit-title">
-            <div class="section-heading">
-              <div>
-                <h2 id="pit-title">停车补给</h2>
-                <p>停稳了，给刚才那一路一个收尾。</p>
-              </div>
-              <span class="pit-mark" aria-hidden="true"><svg class="icon"><use href="#i-coffee"/></svg></span>
-            </div>
+            <div class="section-heading"><div><p class="section-kicker">PIT STOP</p><h2 id="pit-title">停车补给</h2><p>停稳了，给刚才那一路一个收尾。</p></div><span class="pit-mark" aria-hidden="true"><svg class="icon"><use href="#i-coffee"/></svg></span></div>
             <form id="pit-form">
-              <div class="pit-modes" role="group" aria-label="选择回应方式">
-                <button type="button" data-pit-mode="comfort" aria-pressed="true"><svg class="icon"><use href="#i-heart"/></svg>想被安慰</button>
-                <button type="button" data-pit-mode="humor" aria-pressed="false"><svg class="icon"><use href="#i-smile"/></svg>想笑一下</button>
-              </div>
-              <div class="pit-topics" role="group" aria-label="刚才遇到什么">
-                <button type="button" data-pit-topic="traffic" aria-pressed="false">堵了好久</button>
-                <button type="button" data-pit-topic="honk" aria-pressed="false">被喇叭催</button>
-                <button type="button" data-pit-topic="cutin" aria-pressed="false">被加塞</button>
-                <button type="button" data-pit-topic="longday" aria-pressed="false">今天有点累</button>
-              </div>
+              <div class="pit-modes" role="group" aria-label="选择回应方式"><button type="button" data-pit-mode="comfort" aria-pressed="true"><svg class="icon"><use href="#i-heart"/></svg>想被安慰</button><button type="button" data-pit-mode="humor" aria-pressed="false"><svg class="icon"><use href="#i-smile"/></svg>想笑一下</button></div>
+              <div class="pit-topics" role="group" aria-label="刚才遇到什么"><button type="button" data-pit-topic="traffic" aria-pressed="false">堵了好久</button><button type="button" data-pit-topic="honk" aria-pressed="false">被喇叭催</button><button type="button" data-pit-topic="cutin" aria-pressed="false">被加塞</button><button type="button" data-pit-topic="longday" aria-pressed="false">今天有点累</button></div>
               <label class="visually-hidden" for="pit-input">说说刚才发生了什么，可选</label>
               <textarea id="pit-input" rows="2" maxlength="160" placeholder="也可以留一句吐槽……" aria-describedby="pit-privacy"></textarea>
-              <div class="pit-submit-row">
-                <p id="pit-privacy">文字仅在本机匹配预设短句。</p>
-                <button class="pit-submit" id="pit-submit" type="submit">给我一句 <svg class="icon"><use href="#i-arrow"/></svg></button>
-              </div>
+              <div class="pit-submit-row"><p id="pit-privacy">文字仅在本机匹配预设短句。</p><button class="pit-submit" id="pit-submit" type="submit">给我一句 <svg class="icon"><use href="#i-arrow"/></svg></button></div>
             </form>
             <div class="pit-result" id="pit-result" hidden>
-              <div class="pit-result-body" role="status">
-                <h3 id="pit-result-title"></h3>
-                <p id="pit-result-text"></p>
-              </div>
-              <div class="pit-result-actions">
-                <button class="tool-button" id="pit-copy" type="button"><svg class="icon"><use href="#i-copy"/></svg>复制这句</button>
-                <span id="pit-copy-status" role="status"></span>
-              </div>
+              <div class="pit-result-body" role="status"><h3 id="pit-result-title"></h3><p id="pit-result-text"></p></div>
+              <div class="pit-result-actions"><button class="tool-button" id="pit-copy" type="button"><svg class="icon"><use href="#i-copy"/></svg>复制这句</button><button class="tool-button" id="pit-speak" type="button"><svg class="icon"><use href="#i-sound"/></svg>读给我听</button><button class="tool-button" id="pit-save" type="button" aria-pressed="false"><svg class="icon"><use href="#i-heart"/></svg><span id="pit-save-label">收藏这句</span></button><span id="pit-copy-status" role="status"></span></div>
+            </div>
+            <div class="rest-card">
+              <div class="rest-orbit" id="rest-orbit" aria-hidden="true"><span></span><svg class="icon"><use href="#i-leaf"/></svg></div>
+              <div class="rest-copy"><p class="section-kicker">ONE MINUTE RESET</p><h3>给情绪一个服务区</h3><p id="rest-status">跟着圆点，慢慢吸气，再慢慢呼气。</p></div>
+              <div class="rest-controls"><strong id="rest-time">01:00</strong><button class="tool-button" id="rest-start" type="button">开始呼吸</button><button class="tool-button" id="rest-reset" type="button" hidden>重置</button></div>
             </div>
           </section>
         </div>
 
         <div class="side-column">
           <section class="panel detector" id="detector-panel" data-state="idle" aria-labelledby="detector-title">
-            <div class="section-heading">
-              <h2 id="detector-title">鸣笛安抚</h2>
-              <span id="status-pill" class="status-pill" role="status"><i></i><span id="status-label">未开启</span></span>
-            </div>
+            <div class="section-heading"><div><p class="section-kicker">HORN CARE</p><h2 id="detector-title">鸣笛安抚</h2></div><span id="status-pill" class="status-pill" role="status"><i></i><span id="status-label">未开启</span></span></div>
             <p class="detector-explain">听到疑似汽车喇叭，就播一句安抚语音。</p>
-            <div class="meter" aria-hidden="true">
-              <div class="meter-badge"><svg class="icon"><use href="#i-wave"/></svg></div>
-              <div class="waveform" id="waveform"></div>
-            </div>
-            <div class="response" aria-live="polite">
-              <p id="response-text">停车后开启，浏览器会询问麦克风权限。</p>
-            </div>
+            <div class="meter" aria-hidden="true"><div class="meter-badge"><svg class="icon"><use href="#i-wave"/></svg></div><div class="waveform" id="waveform"></div></div>
+            <div class="response" aria-live="polite"><p id="response-text">停车后开启，浏览器会询问麦克风权限。</p></div>
             <button class="button primary" id="mic-button" type="button"><svg class="icon"><use id="mic-icon" href="#i-mic"/></svg><span id="mic-label">开启麦克风感应</span></button>
             <button class="button secondary" id="demo-button" type="button"><svg class="icon"><use href="#i-play"/></svg><span id="demo-label">先试听一次</span></button>
-            <details class="detector-guide">
-              <summary>它怎么工作？</summary>
-              <ul>
-                <li>「先试听一次」会播放一声示例喇叭，再播一句安抚，无需开麦克风。</li>
-                <li>开启后请保持页面打开。附近车的喇叭也可能触发，两次自动语音至少间隔 45 秒。</li>
-                <li>如果音乐或故事正在播放，会先暂停，安抚结束后接着播。</li>
-              </ul>
-            </details>
-            <div class="detector-footer">
-              <label for="sensitivity"><svg class="icon"><use href="#i-sliders"/></svg>识别灵敏度</label>
-              <select id="sensitivity"><option value="low">低</option><option value="normal" selected>标准</option><option value="high">高</option></select>
-            </div>
+            <details class="detector-guide"><summary>它怎么工作？</summary><ul><li>「先试听一次」会播放一声示例喇叭，再播一句安抚，无需开麦克风。</li><li>开启后请保持页面打开。附近车的喇叭也可能触发，两次自动语音至少间隔 45 秒。</li><li>如果音乐或故事正在播放，会先暂停，安抚结束后接着播。</li></ul></details>
+            <div class="detector-footer"><label for="sensitivity"><svg class="icon"><use href="#i-sliders"/></svg>识别灵敏度</label><select id="sensitivity"><option value="low">低</option><option value="normal" selected>标准</option><option value="high">高</option></select></div>
           </section>
 
           <section class="panel navigation" id="navigation" aria-labelledby="navigation-title">
-            <div class="section-heading">
-              <div>
-                <h2 id="navigation-title">驾车路线</h2>
-                <p>出发前查同城路线，交给百度地图导航。</p>
-              </div>
-              <span class="navigation-mark" aria-hidden="true"><svg class="icon"><use href="#i-map"/></svg></span>
-            </div>
+            <div class="section-heading"><div><p class="section-kicker">NEXT DESTINATION</p><h2 id="navigation-title">驾车路线</h2><p>出发前查好，把注意力留给路面。</p></div><span class="navigation-mark" aria-hidden="true"><svg class="icon"><use href="#i-map"/></svg></span></div>
+            <div class="route-tools"><button class="tool-button" id="nav-locate" type="button"><svg class="icon"><use href="#i-locate"/></svg>用当前位置</button><button class="tool-button" id="nav-swap" type="button"><svg class="icon"><use href="#i-swap"/></svg>交换起终点</button><label class="recent-routes" for="nav-recent"><svg class="icon"><use href="#i-clock"/></svg><span class="visually-hidden">最近路线</span><select id="nav-recent"><option value="">最近路线</option></select></label></div>
             <form id="navigation-form" class="navigation-form" novalidate>
-              <label for="nav-city">城市</label>
-              <input id="nav-city" type="text" placeholder="例如深圳" maxlength="30" autocomplete="off" required>
-              <label for="nav-origin">出发地</label>
-              <input id="nav-origin" type="text" placeholder="例如深圳北站" maxlength="100" autocomplete="off" required>
-              <label for="nav-destination">目的地</label>
-              <input id="nav-destination" type="text" placeholder="例如深圳湾公园" maxlength="100" autocomplete="off" required>
+              <label for="nav-city">城市</label><input id="nav-city" type="text" placeholder="例如深圳" maxlength="30" autocomplete="address-level2" aria-describedby="nav-status" required>
+              <label for="nav-origin">出发地</label><input id="nav-origin" type="text" placeholder="例如深圳北站" maxlength="100" autocomplete="off" aria-describedby="nav-status" required>
+              <label for="nav-destination">目的地</label><input id="nav-destination" type="text" placeholder="例如深圳湾公园" maxlength="100" autocomplete="off" aria-describedby="nav-status" required>
               <button class="button primary" id="nav-submit" type="submit"><svg class="icon"><use href="#i-map"/></svg>在百度地图看路线</button>
-              <p class="navigation-note">打开时，地点信息会发送给百度地图。</p>
-              <p id="nav-status" class="navigation-status" role="status"></p>
-              <a id="nav-fallback" class="navigation-fallback" target="_blank" rel="noopener noreferrer" hidden>手动打开百度地图</a>
+              <p class="navigation-note">打开时，地点信息会发送给百度地图。</p><p id="nav-status" class="navigation-status" role="status"></p><a id="nav-fallback" class="navigation-fallback" target="_blank" rel="noopener noreferrer" hidden>手动打开百度地图</a>
             </form>
           </section>
 
           <section class="panel voices" aria-labelledby="voices-title">
-            <div class="section-heading">
-              <h2 id="voices-title">安抚语音</h2>
-              <button type="button" class="text-button" id="preview-button"><svg class="icon"><use href="#i-sound"/></svg><span id="preview-label">试听</span></button>
-            </div>
+            <div class="section-heading"><div><p class="section-kicker">VOICE SELECT</p><h2 id="voices-title">安抚语音</h2></div><button type="button" class="text-button" id="preview-button"><svg class="icon"><use href="#i-sound"/></svg><span id="preview-label">试听</span></button></div>
             <div class="voice-options" role="radiogroup" aria-labelledby="voices-title">
-              <label class="voice-option">
-                <input name="voice" type="radio" value="warm" checked>
-                <span class="voice-art warm"><svg class="icon"><use href="#i-heart"/></svg></span>
-                <span class="voice-meta"><strong>阿暖</strong><span>说句温柔的</span></span>
-                <span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span>
-              </label>
-              <label class="voice-option">
-                <input name="voice" type="radio" value="road">
-                <span class="voice-art road"><svg class="icon"><use href="#i-smile"/></svg></span>
-                <span class="voice-meta"><strong>阿路</strong><span>来点幽默的</span></span>
-                <span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span>
-              </label>
+              <label class="voice-option"><input name="voice" type="radio" value="warm" checked><span class="voice-art warm"><svg class="icon"><use href="#i-heart"/></svg></span><span class="voice-meta"><strong>阿暖</strong><span>说句温柔的</span></span><span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span></label>
+              <label class="voice-option"><input name="voice" type="radio" value="road"><span class="voice-art road"><svg class="icon"><use href="#i-smile"/></svg></span><span class="voice-meta"><strong>阿路</strong><span>来点幽默的</span></span><span class="voice-check"><svg class="icon"><use href="#i-check"/></svg></span></label>
             </div>
           </section>
         </div>
       </div>
     </main>
 
-    <footer><svg class="icon"><use href="#i-shield"/></svg><span>麦克风音频在本机处理。</span></footer>
+    <footer><span class="footer-brand"><svg class="icon"><use href="#i-wave"/></svg>副驾搭子</span><span>麦克风音频在本机处理 · 请安全驾驶</span><span class="footer-version">EDITION 2026</span></footer>
   </div>
+
+  <nav class="mobile-dock" aria-label="移动端快捷导航"><a href="#theater"><svg class="icon"><use href="#i-spark"/></svg><span>剧场</span></a><a href="#radio"><svg class="icon"><use href="#i-wave"/></svg><span>电台</span></a><a href="#navigation"><svg class="icon"><use href="#i-map"/></svg><span>路线</span></a><a href="#detector-panel"><svg class="icon"><use href="#i-mic"/></svg><span>安抚</span></a><a href="#pit-stop"><svg class="icon"><use href="#i-coffee"/></svg><span>补给</span></a></nav>
+
+  <aside class="mini-player" id="mini-player" aria-label="迷你播放器" hidden>
+    <div class="mini-progress"><span id="mini-progress-bar"></span></div>
+    <button class="mini-art" id="mini-art" type="button" aria-label="打开播放队列"><svg class="icon"><use id="mini-art-icon" href="#i-wave"/></svg></button>
+    <div class="mini-copy"><strong id="mini-title">准备播放</strong><span id="mini-meta">副驾搭子</span></div>
+    <input class="mini-seek" id="mini-seek" type="range" min="0" max="1000" value="0" aria-label="播放进度">
+    <span class="mini-time" id="mini-time">0:00</span>
+    <button class="mini-button" id="mini-prev" type="button" aria-label="上一段"><svg class="icon"><use href="#i-prev"/></svg></button>
+    <button class="mini-button mini-play" id="mini-play" type="button" aria-label="暂停"><svg class="icon"><use id="mini-play-icon" href="#i-pause"/></svg></button>
+    <button class="mini-button" id="mini-next" type="button" aria-label="下一段"><svg class="icon"><use href="#i-next"/></svg></button>
+    <button class="mini-button" id="mini-transcript" type="button" aria-label="查看文稿"><svg class="icon"><use href="#i-book"/></svg></button>
+    <button class="mini-button sleep-button" id="sleep-button" type="button" aria-label="设置定时停止"><svg class="icon"><use href="#i-clock"/></svg><span id="sleep-label">定时</span></button>
+    <label class="mini-volume"><svg class="icon"><use href="#i-sound"/></svg><span class="visually-hidden">音量</span><input id="mini-volume" type="range" min="0" max="100" value="72" aria-label="音量"></label>
+    <button class="mini-close" id="mini-close" type="button" aria-label="关闭播放器"><svg class="icon"><use href="#i-close"/></svg></button>
+  </aside>
+
+  <div class="drawer-overlay" id="drawer-overlay" hidden></div>
+  <section class="utility-drawer" id="utility-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+    <header><div><p class="section-kicker">NOW PLAYING</p><h2 id="drawer-title">播放队列</h2></div><button class="icon-button" id="drawer-close" type="button" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></header>
+    <div class="drawer-content" id="drawer-content"></div>
+    <footer><span>内容与偏好仅保存在本机</span><button class="text-button" id="drawer-copy" type="button" hidden><svg class="icon"><use href="#i-copy"/></svg>复制文稿</button></footer>
+  </section>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

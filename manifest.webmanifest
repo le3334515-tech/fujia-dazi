@@ -1,0 +1,14 @@
+{
+  "name": "副驾搭子",
+  "short_name": "副驾搭子",
+  "description": "公路音乐、声音盲盒、双结局故事与停车安抚。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2eee4",
+  "theme_color": "#17281f",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

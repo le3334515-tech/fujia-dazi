@@ -56,6 +56,7 @@
       this.loading = false;
       this.finished = false;
       this.failed = false;
+      this.volume = .72;
 
       this.open.addEventListener('click', () => this.openBox());
       this.pause.addEventListener('click', () => {
@@ -81,6 +82,10 @@
       this.render();
     }
 
+    get isPlaying() {
+      return Boolean(this.playback);
+    }
+
     loadEpisodes() {
       this.catalogRequest ||= fetch('./theater/episodes.json?v=5').then(async (response) => {
         if (!response.ok) throw new Error('Theater manifest unavailable');
@@ -104,7 +109,9 @@
       const cache = this.buffers;
       if (!cache.has(clip)) {
         const pending = Promise.resolve().then(() => {
-          const bytes = Uint8Array.from(atob(clip.audio), (character) => character.charCodeAt(0));
+          const binary = atob(clip.audio);
+          const bytes = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
           return context.decodeAudioData(bytes.buffer);
         }).catch((error) => {
           cache.delete(clip);
@@ -162,6 +169,7 @@
     }
 
     start() {
+      window.dispatchEvent(new CustomEvent('fujia:activate', { detail: { kind: 'theater' } }));
       this.onPlaybackStart?.();
       this.wantsPlayback = true;
       this.failed = false;
@@ -178,6 +186,40 @@
       this.wantsPlayback = false;
       this.cancelRequest();
       this.render();
+    }
+
+    setVolume(volume) {
+      this.volume = Math.max(0, Math.min(1, volume));
+      if (this.playback) this.playback.gain.gain.setTargetAtTime(this.volume, this.playback.context.currentTime, .02);
+    }
+
+    getSnapshot() {
+      const [body, ending] = this.segments || [];
+      const duration = body && ending ? body.duration + ending.duration : 0;
+      const tracks = this.episode ? [
+        { id: `${this.episode.id}-body`, title: this.episode.title, meta: '故事正文', duration: body?.duration || 0, index: 0 },
+        { id: `${this.episode.id}-${this.ending?.id}`, title: this.ending?.title || '随机结局', meta: '结局', duration: ending?.duration || 0, index: 1 },
+      ] : [];
+      return {
+        kind: 'theater',
+        loaded: Boolean(this.episode),
+        state: this.section.dataset.theaterState,
+        title: this.episode?.title || '副驾剧场',
+        meta: this.ending ? `结局 · ${this.ending.title}` : '双结局声音盲盒',
+        duration,
+        progress: Number(this.progress.value) || 0,
+        canSeek: false,
+        canPrevious: false,
+        canNext: Boolean(this.episode),
+        transcript: '',
+        category: 'theater',
+        tracks,
+        currentIndex: this.segment,
+      };
+    }
+
+    emitState() {
+      window.dispatchEvent(new CustomEvent('fujia:state', { detail: this.getSnapshot() }));
     }
 
     setInterruption(interrupted) {
@@ -227,7 +269,7 @@
       const gain = context.createGain();
       const offset = Math.min(this.offset, clip.duration);
       source.buffer = clip;
-      gain.gain.value = .72;
+      gain.gain.value = this.volume;
       source.connect(gain).connect(context.destination);
       try {
         source.start(0, offset);
@@ -345,6 +387,7 @@
       this.pauseIcon.setAttribute('href', this.wantsPlayback ? '#i-pause' : '#i-play');
       this.alt.disabled = !this.finished;
       this.paintProgress();
+      this.emitState();
     }
   }
 
